@@ -1,0 +1,78 @@
+name: Build s9pk
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout package
+        uses: actions/checkout@v4
+        with:
+          path: deepseek-harness-startos
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Set up QEMU (aarch64 builds)
+        uses: docker/setup-qemu-action@v4
+
+      # docker-container driver: required so `docker buildx build -o type=docker`
+      # (what `start-cli s9pk pack` runs internally) is supported.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends squashfs-tools-ng jq
+          curl -fsSL https://start9.com/start-cli/install.sh | sh
+          echo "$HOME/.start9/bin" >> "$GITHUB_PATH"
+          start-cli --version
+
+      - name: Create packaging workspace and signing key
+        run: |
+          mkdir -p workspace
+          cd workspace
+          start-cli s9pk init-workspace .
+          # Pack is local-only: point the default host at localhost so
+          # start-cli never tries to resolve the template's dev-vm.local
+          sed -i 's|default: https://.*|default: http://localhost|' .startos/config.yaml
+          cat .startos/config.yaml
+          # Move the package into the workspace so the signing key is found
+          mv ../deepseek-harness-startos .
+
+      - name: Build universal s9pk
+        working-directory: workspace/deepseek-harness-startos
+        run: |
+          npm ci || npm install
+          make universal
+
+      - name: Inspect package
+        working-directory: workspace/deepseek-harness-startos
+        run: |
+          start-cli s9pk inspect deepseek-harness.s9pk manifest
+          ls -lh *.s9pk
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deepseek-harness-s9pk
+          path: workspace/deepseek-harness-startos/*.s9pk
+          if-no-files-found: error
+
+      - name: Release on tags
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: workspace/deepseek-harness-startos/*.s9pk
+          generate_release_notes: true
