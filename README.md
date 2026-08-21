@@ -52,9 +52,19 @@ La configuració viu a `configs/config.yaml`:
 ```yaml
 api:
   provider: "google"
-  model: "gemini-3.6-flash"   # Model gratuït de Google AI Studio
+  # Sense model fix: l'agent tria automàticament el millor model Flash gratuït
+  # disponible per a la teva clau, amb fallback automàtic si un model falla.
   api_key: "GOOGLE_API_KEY"   # Nom de la variable d'entorn
 ```
+
+### Selecció del model d'IA
+
+El model **no està fixat** al config.yaml. Es determina així (per ordre de prioritat):
+
+1. **Flag CLI:** `python3 scripts/deepseek.py --model gemini-3.6-flash`
+2. **Variable d'entorn:** `export HARNESS_MODEL=gemini-3.6-flash`
+3. **config.yaml:** descomenta `model: "..."` a la secció `api`
+4. **Autodetecció:** l'agent llista els models disponibles amb la teva clau i tria el millor Flash gratuït (`gemini-flash-latest` per defecte), amb **fallback automàtic** als següents si un està sobrecarregat (error 503).
 
 La clau API es llegeix de (per ordre):
 1. Variable d'entorn `GOOGLE_API_KEY`

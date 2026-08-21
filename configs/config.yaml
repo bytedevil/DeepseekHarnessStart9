@@ -1,15 +1,20 @@
 # Configuració de l'agent DeepSeek Harness
-# Versió: 0.4.0.1 (Model Gratuït Gemini 1.5 Flash)
+# Versió: 0.4.0.1
 
 agent:
   name: "DeepSeekHarness"
   version: "0.4.0.1"
-  description: "Agent d'automatització amb el model gratuït Gemini 1.5 Flash"
+  description: "Agent d'automatització amb models de Google AI Studio"
 
 api:
   provider: "google"
-  model: "gemini-3.6-flash"
-  endpoint: "https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent"
+  # Sense model fix: l'agent selecciona automàticament el millor model
+  # gratuït disponible amb la teva clau. Pots forçar-ne un de concret de
+  # tres maneres (per ordre de prioritat):
+  #   1. Flag CLI:        python3 scripts/deepseek.py --model gemini-3.6-flash
+  #   2. Variable entorn: export HARNESS_MODEL=gemini-3.6-flash
+  #   3. Descomenta aquí: model: "gemini-3.6-flash"
+  # model: ""
   api_key: "GOOGLE_API_KEY"
 
 capabilities:
