@@ -1,0 +1,23 @@
+# Configuració de l'agent DeepSeek Harness
+# Versió: 0.4.0.1 (Model Gratuït Gemini 1.5 Flash)
+
+agent:
+  name: "DeepSeekHarness"
+  version: "0.4.0.1"
+  description: "Agent d'automatització amb el model gratuït Gemini 1.5 Flash"
+
+api:
+  provider: "google"
+  model: "gemini-3.6-flash"
+  endpoint: "https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent"
+  api_key: "GOOGLE_API_KEY"
+
+capabilities:
+  web_search: true
+  file_operations: true
+  shell_execution: true
+
+startos:
+  mode: "auto"
+  max_concurrent_tasks: 4
+  timeout_seconds: 3600

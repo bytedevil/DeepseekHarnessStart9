@@ -1,0 +1,4 @@
+google-generativeai
+browser-use
+pyyaml
+python-dotenv

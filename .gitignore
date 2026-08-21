@@ -1,0 +1,20 @@
+# Entorn virtual
+.venv/
+venv/
+
+# Fitxers amb secrets (claus API)
+.env
+
+# Sortides d'execució de l'agent
+agent_results.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Editors / SO
+.vscode/
+.idea/
+.DS_Store
