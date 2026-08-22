@@ -2,11 +2,30 @@ FROM node:22-slim
 
 # Python for the native-API agent harness
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 python3-pip ca-certificates \
+    && apt-get install -y --no-install-recommends python3 python3-pip ca-certificates bubblewrap \
     && rm -rf /var/lib/apt/lists/*
 
-# DeepSeek Harness CLI (provides the `dsh web` browser UI)
-RUN npm install -g @deepseek-ai/dsh@0.1.1-rc.1
+# DeepSeek Harness CLI (provides the `dsh web` browser UI).
+#
+# npm omits optionalDependencies for global installs (known npm behavior),
+# which silently drops the platform binaries dsh needs:
+#   - @deepseek-ai/node-addon-landlock-run-<arch> : the bash tool's
+#     landlock sandbox launcher (spawn ENOENT without it)
+#   - @vscode/ripgrep-<arch>                      : the glob/grep tools
+#     ("ripgrep launch failed" without it)
+# Install them explicitly into the same tree, matching dsh's versions.
+RUN set -eux; \
+    npm install -g @deepseek-ai/dsh@0.1.1-rc.1; \
+    GLOBAL_ROOT="$(npm root -g)/@deepseek-ai/dsh/node_modules"; \
+    mkdir -p "$GLOBAL_ROOT/@deepseek-ai" "$GLOBAL_ROOT/@vscode"; \
+    npm install --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-x64" @deepseek-ai/node-addon-landlock-run-linux-x64@0.1.1; \
+    npm install --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-arm64" @deepseek-ai/node-addon-landlock-run-linux-arm64@0.1.1; \
+    npm install --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-x64" @vscode/ripgrep-linux-x64@1.18.0; \
+    npm install --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-arm64" @vscode/ripgrep-linux-arm64@1.18.0; \
+    chmod 755 "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-"*/bin/landlock-run \
+              "$(npm root -g)/@deepseek-ai/dsh/node_modules/@vscode/ripgrep-linux-"*/bin/rg; \
+    # Fail the build early if either binary is missing on any arch layer.
+    test -x "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-x64/bin/landlock-run"
 
 WORKDIR /app
 
