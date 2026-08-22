@@ -35,7 +35,8 @@ RUN set -eux; \
       url="$(npm view "$spec" dist.tarball)"; \
       echo "fetching $spec from $url"; \
       mkdir -p "$TMP/out"; \
-      curl -fsSL "$url" | tar -xz -C "$TMP/out"; \
+      npm pack "$url" --pack-destination "$TMP" --silent; \
+      tar -xzf "$TMP"/$(basename "$url") -C "$TMP/out"; \
       mkdir -p "$GLOBAL_ROOT/$name"; \
       cp -r "$TMP/out/package/." "$GLOBAL_ROOT/$name/"; \
       rm -rf "$TMP/out"; \
