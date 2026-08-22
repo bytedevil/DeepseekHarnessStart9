@@ -18,17 +18,33 @@ ARG TARGETARCH=amd64
 RUN set -eux; \
     npm install -g @deepseek-ai/dsh@0.1.1-rc.1; \
     GLOBAL_ROOT="$(npm root -g)/@deepseek-ai/dsh/node_modules"; \
-    mkdir -p "$GLOBAL_ROOT/@deepseek-ai" "$GLOBAL_ROOT/@vscode"; \
-    # --force: these packages declare cpu/os fields, so installing the x64
-    # binary on an arm64 builder (and vice versa) would fail EBADPLATFORM.
-    # They are static prebuilt binaries; dsh resolves the right one at
-    # runtime, so carrying both is harmless and keeps one Dockerfile.
-    npm install --force --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-x64" @deepseek-ai/node-addon-landlock-run-linux-x64@0.1.1; \
-    npm install --force --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-arm64" @deepseek-ai/node-addon-landlock-run-linux-arm64@0.1.1; \
-    npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-x64" @vscode/ripgrep-linux-x64@1.18.0; \
-    npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-arm64" @vscode/ripgrep-linux-arm64@1.18.0; \
-    find "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-"*/bin "$GLOBAL_ROOT/@vscode/ripgrep-linux-"*/bin -type f -exec chmod 755 {} \;; \
-    test -x "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run"
+    # npm omits optionalDependencies for global installs, and 'npm install
+    # --prefix' nests the payload under an extra node_modules/ level, which
+    # is the wrong place for dsh's runtime resolution. Download each
+    # platform binary's tarball and unpack it directly into the exact path
+    # dsh expects ($GLOBAL_ROOT/<name>/bin/...). Static prebuilts for both
+    # arches are carried so one image serves both StartOS targets.
+    TMP="$(mktemp -d)"; \
+    for spec in \
+      "@deepseek-ai/node-addon-landlock-run-linux-x64@0.1.1" \
+      "@deepseek-ai/node-addon-landlock-run-linux-arm64@0.1.1" \
+      "@vscode/ripgrep-linux-x64@1.18.0" \
+      "@vscode/ripgrep-linux-arm64@1.18.0" \
+    ; do \
+      name="${spec%@*}"; \
+      url="$(npm view "$spec" dist.tarball)"; \
+      echo "fetching $spec from $url"; \
+      mkdir -p "$TMP/out"; \
+      curl -fsSL "$url" | tar -xz -C "$TMP/out"; \
+      mkdir -p "$GLOBAL_ROOT/$name"; \
+      cp -r "$TMP/out/package/." "$GLOBAL_ROOT/$name/"; \
+      rm -rf "$TMP/out"; \
+    done; \
+    rm -rf "$TMP"; \
+    chmod 755 "$GLOBAL_ROOT"/@deepseek-ai/node-addon-landlock-run-linux-*/bin/landlock-run \
+              "$GLOBAL_ROOT"/@vscode/ripgrep-linux-*/bin/rg; \
+    test -x "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run"; \
+    test -x "$GLOBAL_ROOT/@vscode/ripgrep-linux-${TARGETARCH}/bin/rg"
 
 WORKDIR /app
 
