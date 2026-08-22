@@ -1,1 +1,41 @@
-<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><rect width='256' height='256' fill='#000'/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- DeepSeek Harness: whale-inspired mark over a deep gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a2b4c"/>
+      <stop offset="1" stop-color="#0d1526"/>
+    </linearGradient>
+    <linearGradient id="whale" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C93FF"/>
+      <stop offset="1" stop-color="#4D6BFE"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#bg)"/>
+  <!-- whale body: rounded arc sweeping right -->
+  <path d="M52 148
+           C52 108 84 84 126 84
+           C168 84 196 106 202 138
+           C205 154 198 166 186 170
+           C192 158 190 146 180 140
+           C184 156 172 166 156 166
+           L96 166
+           C70 166 52 160 52 148 Z"
+        fill="url(#whale)"/>
+  <!-- tail fluke -->
+  <path d="M196 128
+           C210 116 224 114 232 118
+           C222 124 218 132 218 142
+           C212 136 204 130 194 130 Z"
+        fill="url(#whale)"/>
+  <!-- belly highlight -->
+  <path d="M96 166 C140 176 176 168 188 150 C186 164 172 174 152 174 L100 174 Z"
+        fill="#8FA3FF" opacity="0.55"/>
+  <!-- eye -->
+  <circle cx="92" cy="128" r="7" fill="#0d1526"/>
+  <circle cx="94" cy="126" r="2.4" fill="#ffffff"/>
+  <!-- water spout (thicker for small-size legibility) -->
+  <path d="M120 74 C122 60 130 52 142 50
+           M120 74 C114 62 104 58 96 58
+           M120 74 C122 62 120 54 116 48"
+        stroke="#8FA3FF" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.9"/>
+</svg>
