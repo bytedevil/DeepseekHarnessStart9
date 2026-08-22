@@ -1,6 +1,6 @@
 #!/bin/sh
 # Web UI supervisor: runs `dsh web` (loopback-only by upstream design)
-# plus the TCP forwarder that exposes it to StartOS on $PROXY_PORT.
+# plus the HTTP/WS forwarder that exposes it to StartOS on $PROXY_PORT.
 # The python agent runs in its own daemon — do NOT start it here.
 #
 # If either child dies, exit nonzero so StartOS restarts the daemon.
@@ -20,21 +20,21 @@ mkdir -p "$PROJECTS_DIR"
 chmod 775 "$PROJECTS_DIR" 2>/dev/null || true
 cd "$PROJECTS_DIR" || { echo "[webui] cannot cd into $PROJECTS_DIR"; exit 1; }
 
-# dsh's browser-trust fence only accepts Host: 127.0.0.1 or LAN IP
-# literals (anti-DNS-rebinding). Users reach the UI through the server's
-# mDNS name (e.g. node.local:PORT), so whitelist every plausible
-# authority: the container hostname, its .local form, and node.local.
+# dsh's browser-trust fence validates the Host header. StartOS exposes the
+# service on a RANDOM external port, so whitelist BARE hostnames (which
+# cover every port): mDNS name, container hostname, .local form. The proxy
+# additionally rewrites Host to 127.0.0.1, which dsh always trusts.
 HOSTNAME_VAL="$(hostname 2>/dev/null || echo server)"
-TRUSTED="--trusted-host ${HOSTNAME_VAL}:${PROXY_PORT}"
-TRUSTED="$TRUSTED --trusted-host ${HOSTNAME_VAL}.local:${PROXY_PORT}"
-TRUSTED="$TRUSTED --trusted-host node.local:${PROXY_PORT}"
+TRUSTED="--trusted-host ${HOSTNAME_VAL}"
+TRUSTED="$TRUSTED --trusted-host ${HOSTNAME_VAL}.local"
+TRUSTED="$TRUSTED --trusted-host node.local"
 
 echo "[webui] workspace: $PROJECTS_DIR (uid $(id -u))"
 echo "[webui] starting dsh web on 127.0.0.1:$DSH_WEB_PORT ($TRUSTED)"
 dsh web --port "$DSH_WEB_PORT" --no-open $TRUSTED &
 DSH_PID=$!
 
-echo "[webui] starting tcp proxy on 0.0.0.0:$PROXY_PORT -> 127.0.0.1:$DSH_WEB_PORT"
+echo "[webui] starting http/ws proxy on 0.0.0.0:$PROXY_PORT -> 127.0.0.1:$DSH_WEB_PORT"
 node /app/web-proxy.js &
 PROXY_PID=$!
 
