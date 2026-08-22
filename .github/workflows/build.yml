@@ -45,8 +45,9 @@ jobs:
             -o "$HOME/.start9/bin/start-cli" \
             "https://github.com/Start9Labs/start-technologies/releases/download/start-cli%2Fv1.1.0/start-cli_x86_64-linux"
           chmod +x "$HOME/.start9/bin/start-cli"
+          # GITHUB_PATH only affects later steps; verify by absolute path.
+          "$HOME/.start9/bin/start-cli" --version
           echo "$HOME/.start9/bin" >> "$GITHUB_PATH"
-          start-cli --version
 
       - name: Create packaging workspace and signing key
         run: |
