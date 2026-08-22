@@ -12,7 +12,7 @@ export const current = VersionInfo.of({
     pl_PL:
       'Naprawiono narzędzia agenta: sandbox bash (landlock/bwrap) i binaria ripgrep są teraz w obrazie; zachowano poprawki czatu i listy katalogów z 0.0.2.',
     fr_FR:
-      'Outils de l'agent réparés : sandbox bash (landlock/bwrap) et binaires ripgrep désormais inclus dans l'image ; corrections du chat temps réel et du listage (0.0.2) conservées.',
+      "Outils de l'agent réparés : sandbox bash (landlock/bwrap) et binaires ripgrep désormais inclus dans l'image ; corrections du chat temps réel et du listage (0.0.2) conservées.",
   },
   migrations: {
     up: async ({ effects }) => {},
