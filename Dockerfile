@@ -44,8 +44,14 @@ RUN set -eux; \
     rm -rf "$TMP"; \
     chmod 755 "$GLOBAL_ROOT"/@deepseek-ai/node-addon-landlock-run-linux-*/bin/landlock-run \
               "$GLOBAL_ROOT"/@vscode/ripgrep-linux-*/bin/rg; \
-    test -x "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run"; \
-    test -x "$GLOBAL_ROOT/@vscode/ripgrep-linux-${TARGETARCH}/bin/rg"
+    # TARGETARCH is amd64/arm64 (Docker); the npm packages use x64/arm64.
+    case "$TARGETARCH" in \
+      amd64) PKGARCH=x64 ;; \
+      arm64) PKGARCH=arm64 ;; \
+      *) echo "unsupported TARGETARCH: $TARGETARCH"; exit 1 ;; \
+    esac; \
+    test -x "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-${PKGARCH}/bin/landlock-run"; \
+    test -x "$GLOBAL_ROOT/@vscode/ripgrep-linux-${PKGARCH}/bin/rg"
 
 WORKDIR /app
 
