@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow
 [ExVer](https://github.com/Start9Labs/start-os/blob/master/shared-libs/crates/start-core/src/s9pk/v2/manifest.rs)
 (`X.Y.Z:N` — package version : spec version).
 
+## [0.0.4] — 2026-08-22
+
+### Added
+- **System Administration action** (Settings panel): sign in to your own
+  StartOS server with the master password (`start-cli auth login`) and
+  administer the whole server — install/update packages, change system
+  settings, manage hosts, SSH, backups — from this service. The password is
+  passed only to that single command invocation (never written to disk,
+  config files, or logs); the derived session key persists under
+  `/data/startos-cli` on the service volume.
+
+### Changed
+- Author metadata: **Pau Font Martínez**, contact `contacte@pau.fm`,
+  support site now points to the contact address; PayPal donation link
+  updated to the account associated with `paufont@gmail.com`.
+
 ## [0.0.3] — 2026-08-22
 
 ### Fixed
@@ -67,6 +83,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow
 - CI (GitHub Actions): universal `.s9pk` builds (x86_64 + aarch64) on push and
   tag releases using buildx docker-container driver per Start9's own recipe.
 
+[0.0.4]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.4
 [0.0.3]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.3
 [0.0.2]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.2
 [0.0.1]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.1

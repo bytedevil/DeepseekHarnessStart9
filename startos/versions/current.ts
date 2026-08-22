@@ -1,18 +1,18 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.0.3:0',
+  version: '0.0.4:0',
   releaseNotes: {
     en_US:
-      'Agent tools repaired: bash sandbox (landlock/bwrap) and ripgrep search binaries now ship in the image; realtime chat and directory listing fixes from 0.0.2 retained.',
+      'New System Administration action: sign in to StartOS with the master password and administer the whole server from this service. Author contact and PayPal donations updated.',
     es_ES:
-      'Herramientas del agente reparadas: el sandbox bash (landlock/bwrap) y los binarios de búsqueda ripgrep ahora se incluyen en la imagen; se mantienen las correcciones de chat en tiempo real y listado de directorios de 0.0.2.',
+      'Nueva acción de Administración del sistema: inicia sesión en StartOS con la contraseña maestra y administra todo el servidor desde este servicio. Contacto del autor y donaciones PayPal actualizados.',
     de_DE:
-      'Agent-Tools repariert: Bash-Sandbox (landlock/bwrap) und Ripgrep-Binaries sind jetzt im Image enthalten; Korrekturen für Echtzeit-Chat und Verzeichnisliste aus 0.0.2 beibehalten.',
+      'Neue Aktion „Systemverwaltung": Melde dich mit dem Masterpasswort bei StartOS an und verwalte den gesamten Server über diesen Dienst. Autorenkontakt und PayPal-Spenden aktualisiert.',
     pl_PL:
-      'Naprawiono narzędzia agenta: sandbox bash (landlock/bwrap) i binaria ripgrep są teraz w obrazie; zachowano poprawki czatu i listy katalogów z 0.0.2.',
+      'Nowa akcja Administracja systemem: zaloguj się do StartOS hasłem głównym i zarządzaj całym serwerem z tej usługi. Zaktualizowano kontakt autora i darowizny PayPal.',
     fr_FR:
-      "Outils de l'agent réparés : sandbox bash (landlock/bwrap) et binaires ripgrep désormais inclus dans l'image ; corrections du chat temps réel et du listage (0.0.2) conservées.",
+      "Nouvelle action Administration système : connectez-vous à StartOS avec le mot de passe maître et administrez tout le serveur depuis ce service. Contact de l'auteur et dons PayPal mis à jour.",
   },
   migrations: {
     up: async ({ effects }) => {},

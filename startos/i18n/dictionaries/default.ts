@@ -27,6 +27,18 @@ const dict = {
   'Web UI URL': 20,
   // interfaces.ts
   'The DeepSeek Harness browser interface (dsh web)': 21,
+  // actions/system-admin.ts
+  'Server address': 22,
+  'The address you use to reach StartOS, e.g. node.local or 192.168.1.10': 23,
+  'StartOS master password': 24,
+  'Used once to sign in; never stored on disk or included in logs.': 25,
+  'System Administration': 26,
+  'Sign in to StartOS with the master password to administer the whole server from this panel.': 27,
+  'Grants full control of your StartOS server. The password is used once for signing in and never saved.': 28,
+  'Sign-in failed': 29,
+  'start-cli could not sign in. Check the server address and master password, then try again.': 30,
+  'Session established': 31,
+  'Signed in successfully. Full server administration is now available from this service.': 32,
 } as const
 
 /**
