@@ -18,13 +18,16 @@ RUN set -eux; \
     npm install -g @deepseek-ai/dsh@0.1.1-rc.1; \
     GLOBAL_ROOT="$(npm root -g)/@deepseek-ai/dsh/node_modules"; \
     mkdir -p "$GLOBAL_ROOT/@deepseek-ai" "$GLOBAL_ROOT/@vscode"; \
-    npm install --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-x64" @deepseek-ai/node-addon-landlock-run-linux-x64@0.1.1; \
-    npm install --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-arm64" @deepseek-ai/node-addon-landlock-run-linux-arm64@0.1.1; \
-    npm install --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-x64" @vscode/ripgrep-linux-x64@1.18.0; \
-    npm install --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-arm64" @vscode/ripgrep-linux-arm64@1.18.0; \
-    chmod 755 "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-"*/bin/landlock-run \
-              "$(npm root -g)/@deepseek-ai/dsh/node_modules/@vscode/ripgrep-linux-"*/bin/rg; \
-    # Fail the build early if either binary is missing on any arch layer.
+    # --force: these packages declare cpu/os fields, so installing the x64
+    # binary on an arm64 builder (and vice versa) would fail EBADPLATFORM.
+    # They are static prebuilt binaries; dsh resolves the right one at
+    # runtime, so carrying both is harmless and keeps one Dockerfile.
+    npm install --force --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-x64" @deepseek-ai/node-addon-landlock-run-linux-x64@0.1.1; \
+    npm install --force --prefix "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-arm64" @deepseek-ai/node-addon-landlock-run-linux-arm64@0.1.1; \
+    npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-x64" @vscode/ripgrep-linux-x64@1.18.0; \
+    npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-arm64" @vscode/ripgrep-linux-arm64@1.18.0; \
+    find "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-"*/bin "$GLOBAL_ROOT/@vscode/ripgrep-linux-"*/bin -type f -exec chmod 755 {} \;; \
+    test -x "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run" || \
     test -x "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-x64/bin/landlock-run"
 
 WORKDIR /app
