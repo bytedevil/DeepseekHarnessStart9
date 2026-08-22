@@ -32,10 +32,19 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Install packaging tools
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends squashfs-tools-ng jq
-          curl -fsSL https://start9.com/start-cli/install.sh | sh
+          # The public installer hits api.github.com unauthenticated and
+          # gets rate-limited (403) on busy runners. Download the pinned
+          # release asset directly with the workflow's own token.
+          mkdir -p "$HOME/.start9/bin"
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            -o "$HOME/.start9/bin/start-cli" \
+            "https://github.com/Start9Labs/start-technologies/releases/download/start-cli%2Fv1.1.0/start-cli_x86_64-linux"
+          chmod +x "$HOME/.start9/bin/start-cli"
           echo "$HOME/.start9/bin" >> "$GITHUB_PATH"
           start-cli --version
 
