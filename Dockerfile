@@ -14,6 +14,7 @@ RUN apt-get update \
 #   - @vscode/ripgrep-<arch>                      : the glob/grep tools
 #     ("ripgrep launch failed" without it)
 # Install them explicitly into the same tree, matching dsh's versions.
+ARG TARGETARCH=amd64
 RUN set -eux; \
     npm install -g @deepseek-ai/dsh@0.1.1-rc.1; \
     GLOBAL_ROOT="$(npm root -g)/@deepseek-ai/dsh/node_modules"; \
@@ -27,8 +28,7 @@ RUN set -eux; \
     npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-x64" @vscode/ripgrep-linux-x64@1.18.0; \
     npm install --force --prefix "$GLOBAL_ROOT/@vscode/ripgrep-linux-arm64" @vscode/ripgrep-linux-arm64@1.18.0; \
     find "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-"*/bin "$GLOBAL_ROOT/@vscode/ripgrep-linux-"*/bin -type f -exec chmod 755 {} \;; \
-    test -x "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run" || \
-    test -x "$(npm root -g)/@deepseek-ai/dsh/node_modules/@deepseek-ai/node-addon-landlock-run-linux-x64/bin/landlock-run"
+    test -x "$GLOBAL_ROOT/@deepseek-ai/node-addon-landlock-run-linux-${TARGETARCH}/bin/landlock-run"
 
 WORKDIR /app
 
