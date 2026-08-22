@@ -1,18 +1,18 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.0.2:0',
+  version: '0.0.3:0',
   releaseNotes: {
     en_US:
-      'Realtime chat fixed (WebSocket + streaming through the proxy), directory listing 403 fixed (Host rewritten to loopback), projects workspace at /data/projects, DeepSeek Harness logo added.',
+      'Agent tools repaired: bash sandbox (landlock/bwrap) and ripgrep search binaries now ship in the image; realtime chat and directory listing fixes from 0.0.2 retained.',
     es_ES:
-      'Chat en tiempo real corregido (WebSocket y streaming a través del proxy), error 403 del listado de directorios resuelto (Host reescrito a loopback), espacio de proyectos en /data/projects y logo de DeepSeek Harness añadido.',
+      'Herramientas del agente reparadas: el sandbox bash (landlock/bwrap) y los binarios de búsqueda ripgrep ahora se incluyen en la imagen; se mantienen las correcciones de chat en tiempo real y listado de directorios de 0.0.2.',
     de_DE:
-      'Echtzeit-Chat korrigiert (WebSocket und Streaming über den Proxy), 403-Fehler der Verzeichnisliste behoben (Host auf Loopback umgeschrieben), Projektordner unter /data/projects, DeepSeek-Harness-Logo hinzugefügt.',
+      'Agent-Tools repariert: Bash-Sandbox (landlock/bwrap) und Ripgrep-Binaries sind jetzt im Image enthalten; Korrekturen für Echtzeit-Chat und Verzeichnisliste aus 0.0.2 beibehalten.',
     pl_PL:
-      'Naprawiono czat w czasie rzeczywistym (WebSocket i strumieniowanie przez proxy), naprawiono błąd 403 listy katalogów (nagłówek Host przepisywany na loopback), katalog projektów /data/projects, dodano logo DeepSeek Harness.',
+      'Naprawiono narzędzia agenta: sandbox bash (landlock/bwrap) i binaria ripgrep są teraz w obrazie; zachowano poprawki czatu i listy katalogów z 0.0.2.',
     fr_FR:
-      'Chat en temps réel corrigé (WebSocket et streaming via le proxy), erreur 403 du listage des répertoires résolue (Host réécrit vers loopback), espace projets dans /data/projects, logo DeepSeek Harness ajouté.',
+      'Outils de l'agent réparés : sandbox bash (landlock/bwrap) et binaires ripgrep désormais inclus dans l'image ; corrections du chat temps réel et du listage (0.0.2) conservées.',
   },
   migrations: {
     up: async ({ effects }) => {},
