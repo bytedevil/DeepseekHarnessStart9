@@ -50,5 +50,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow
 - CI (GitHub Actions): universal `.s9pk` builds (x86_64 + aarch64) on push and
   tag releases using buildx docker-container driver per Start9's own recipe.
 
-[0.0.2]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.1
+[0.0.2]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.2
 [0.0.1]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.1
