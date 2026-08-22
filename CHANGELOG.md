@@ -5,6 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow
 [ExVer](https://github.com/Start9Labs/start-os/blob/master/shared-libs/crates/start-core/src/s9pk/v2/manifest.rs)
 (`X.Y.Z:N` — package version : spec version).
 
+## [0.0.3] — 2026-08-22
+
+### Fixed
+- **Agent tools (bash / glob / grep) all failed inside the web UI**:
+  `spawn .../landlock-run ENOENT` and "ripgrep launch failed". Root cause:
+  `npm install -g` silently omits `optionalDependencies`, which is where dsh
+  ships its platform binaries (`@deepseek-ai/node-addon-landlock-run-*` for
+  the bash sandbox, `@vscode/ripgrep-*` for search). The image now unpacks
+  both prebuilt binaries (x64 + arm64) directly into dsh's module tree at
+  the exact paths its runtime resolver expects, verified at build time.
+- Added `bubblewrap` — the first rung of dsh's Linux sandbox provider chain,
+  preferred over landlock when present.
+
+### Changed
+- CI: `start-cli` fetched as a pinned release asset with the workflow token
+  (the public installer hit GitHub API rate limits, HTTP 403).
+
 ## [0.0.2] — 2026-08-22
 
 ### Fixed
@@ -50,5 +67,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions follow
 - CI (GitHub Actions): universal `.s9pk` builds (x86_64 + aarch64) on push and
   tag releases using buildx docker-container driver per Start9's own recipe.
 
+[0.0.3]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.3
 [0.0.2]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.2
 [0.0.1]: https://github.com/bytedevil/DeepseekHarnessStart9/releases/tag/v0.0.1
