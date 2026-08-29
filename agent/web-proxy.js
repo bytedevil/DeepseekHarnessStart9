@@ -1,10 +1,10 @@
-// HTTP + WebSocket reverse proxy: 0.0.0.0:$PROXY_PORT -> 127.0.0.1:$TARGET_PORT
+// HTTP + WebSocket relay: 0.0.0.0:$PROXY_PORT -> 127.0.0.1:$TARGET_PORT
 //
-// dsh web binds loopback only (upstream refuses 0.0.0.0) and its
-// browser-trust fence validates the Host header. StartOS exposes the
-// service on a RANDOM external port under names like node.local, so we
-// rewrite Host/Origin/Referer to the loopback authority dsh natively
-// trusts, then forward.
+// dsh web binds loopback only, which the StartOS reverse proxy cannot reach —
+// it dials the container's bridge address. This relay is the one hop between
+// the two. Headers pass through untouched: dsh fences its own /api routes on
+// the Host header, and the daemon is started with the authorities this
+// interface actually answers to (DSH_TRUSTED_HOSTS).
 //
 // Realtime notes (the chat only renders live events over WS/SSE):
 // - upgrades use Node's parsed headers (no raw-buffer surgery)
@@ -17,25 +17,6 @@ const net = require('node:net')
 const PROXY_PORT = Number(process.env.PROXY_PORT || 4201)
 const TARGET_HOST = '127.0.0.1'
 const TARGET_PORT = Number(process.env.TARGET_PORT || 4200)
-const TARGET_AUTHORITY = `${TARGET_HOST}:${TARGET_PORT}`
-
-function scrubRequestHeaders(headers) {
-  const out = {}
-  for (const [key, value] of Object.entries(headers)) {
-    const k = key.toLowerCase()
-    if (k === 'host') out[key] = TARGET_AUTHORITY
-    else if (k === 'origin') out[key] = `http://${TARGET_AUTHORITY}`
-    else if (k === 'referer' && typeof value === 'string' && value.includes('://')) {
-      try {
-        const u = new URL(value)
-        out[key] = `http://${TARGET_AUTHORITY}${u.pathname}${u.search}`
-      } catch {
-        out[key] = value
-      }
-    } else out[key] = value
-  }
-  return out
-}
 
 const server = http.createServer((req, res) => {
   res.socket?.setNoDelay(true)
@@ -46,7 +27,7 @@ const server = http.createServer((req, res) => {
       port: TARGET_PORT,
       path: req.url,
       method: req.method,
-      headers: scrubRequestHeaders(req.headers),
+      headers: req.headers,
     },
     (upstreamRes) => {
       res.writeHead(upstreamRes.statusCode || 502, upstreamRes.headers)
@@ -62,8 +43,8 @@ const server = http.createServer((req, res) => {
   req.pipe(upstreamReq)
 })
 
-// WebSocket upgrades: replay Node's parsed (and scrubbed) headers to the
-// upstream, forward the pre-parsed body chunk, then splice both pipes.
+// WebSocket upgrades: replay Node's parsed headers to the upstream, forward the
+// pre-parsed body chunk, then splice both pipes.
 server.on('upgrade', (req, socket, head) => {
   socket.setNoDelay(true)
   const upstream = net.connect(TARGET_PORT, TARGET_HOST)
@@ -71,8 +52,7 @@ server.on('upgrade', (req, socket, head) => {
 
   upstream.on('connect', () => {
     const lines = [`${req.method} ${req.url} HTTP/1.1`]
-    const scrubbed = scrubRequestHeaders(req.headers)
-    for (const [key, value] of Object.entries(scrubbed)) {
+    for (const [key, value] of Object.entries(req.headers)) {
       if (Array.isArray(value)) value.forEach((v) => lines.push(`${key}: ${v}`))
       else lines.push(`${key}: ${value}`)
     }
@@ -108,7 +88,5 @@ server.on('error', (err) => {
 })
 
 server.listen(PROXY_PORT, '0.0.0.0', () => {
-  console.log(
-    `[web-proxy] http+ws 0.0.0.0:${PROXY_PORT} -> ${TARGET_AUTHORITY} (Host rewritten, timeouts off)`,
-  )
+  console.log(`[web-proxy] http+ws 0.0.0.0:${PROXY_PORT} -> ${TARGET_HOST}:${TARGET_PORT}`)
 })

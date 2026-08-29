@@ -1,17 +1,25 @@
 # Updating the upstream version
 
-<!--
-TODO: Describe what "upstream" means for DeepSeek Harness (a Docker image pinned by tag, a git
-submodule, or a self-built image) and how to track its version. See UPDATING.md in other
-packages for the pattern, and start-technologies/projects/start-sdk/docs/src/versions.md for the version rules.
-Remove these comments.
--->
+Upstream is [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness), released
+to npm as [`@deepseek-ai/dsh`](https://www.npmjs.com/package/@deepseek-ai/dsh). This package builds its
+own image and installs that CLI globally into it, so "upstream" means the npm version, not a Docker tag.
 
 ## Determining the upstream version
 
-<!-- TODO: where the current pin lives in startos/manifest/index.ts, and how to fetch the
-     latest upstream version (e.g. `gh release view -R <org>/<repo> --json tagName -q .tagName`). -->
+```sh
+npm view @deepseek-ai/dsh version
+```
+
+The current pin lives in `Dockerfile`, in the `npm install -g @deepseek-ai/dsh@<version>` line.
+
+`dsh` publishes prereleases only, and `npm view` reports the newest one, so the pin is normally a
+release-candidate tag.
 
 ## Applying the bump
 
-<!-- TODO: the exact file and field to edit, including any tag-format quirks. -->
+- Edit the version in the `npm install -g @deepseek-ai/dsh@<version>` line in `Dockerfile`.
+- Bump `version` in `startos/versions/current.ts` and write its `releaseNotes` for all five locales.
+- Rebuild and open the web interface. The two platform binaries the image installs by hand — ripgrep
+  and landlock-run — are resolved at build time from their parent packages' `optionalDependencies`, so
+  a bump that moves either one is picked up automatically, but only the build proves it: exercise the
+  agent's bash and grep tools before releasing.
