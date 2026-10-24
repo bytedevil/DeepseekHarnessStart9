@@ -6,9 +6,10 @@ export const manifest = setupManifest({
   title: 'DeepSeek Harness',
   license: 'MIT',
   author: 'Pau Font Martínez',
-  packageRepo: 'https://github.com/bytedevil/DeepseekHarnessStart9',
-  upstreamRepo: 'https://github.com/bytedevil/DeepseekHarnessStart9',
-  supportSite: 'mailto:contacte@paufont.cat',
+  packageRepo: 'https://github.com/Start9-Community/DeepseekHarnessStart9',
+  upstreamRepo: 'https://github.com/deepseek-ai/deepseek-harness',
+  supportSite:
+    'https://github.com/Start9-Community/DeepseekHarnessStart9/issues',
   marketingUrl: 'https://paufont.cat',
   donationUrl:
     'https://www.paypal.com/paypalme/pfont?locale.x=ca_ES&email=paufont%40gmail.com',
